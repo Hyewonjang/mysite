@@ -1,7 +1,7 @@
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
-        <li><a href={% url 'polls:detail' question.id %}>{{ question.question_text }}</a></li>
+        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li> <!--[비록 post와 달리 method로서 get을 표시한 것은 아니지만]이와 같이 조회용으로 데이터를 요청하는 방식을 post의 반대인 get(데이터 조회를 위한 요청방식) 방식이라고 함.-->
     {% endfor %}
     </ul>
 {% else %}

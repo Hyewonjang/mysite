@@ -1,0 +1,11 @@
+<h1>{{ question.question_text }}</h1>
+
+<ul>
+    {% for choice in question.choice_set.all %} <!--question.choice_set.all : 해당 question을 외래키로 가지는 choice들을 모든 것을 가져와라.-->
+    <li>
+        {{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }} <!--pluralize(django template 기능 중 하나)는 choice.votes가 단수인 경우에는 단수 처리을 하고 복수인 경우에는 복수처리(vote에 s를 붙임.)을 해주겠다는 의미-->
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
