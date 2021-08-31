@@ -1,0 +1,17 @@
+<h1>{{ question.question_text }}</h1>
+
+<!-- <ul>
+{% for choice in question.choice_set.all %} <!--question.choice_set.all : 해당 question을 외래키로 가지는 choice들을 모든 것을 가져와라.
+<li>{{ choice.choice_text }}</li>
+{% endfor %}
+</ul> -->
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'polls:vote' question.id %}" method="post"> <!--데이터 생성 및 변경(폼을 전송하는 행위의 결과)은 method로 post를 쓴다 / question.id가 polls:vote의 urlpattern의 question_id에 대입된다. / submit 버튼을 누르면 해당 url로 이동하게 됨.-->
+{% csrf_token %} <!--해킹(사이트 간 위조 요청이란? 사용자와 서버 사이의 데이터를 해커가 임의로 변경하는 것) 방지를 위해서 넣은 코드. (웹프레임워크를 이용하는 이유 : 개인 스스로 모든 보안을 관리할 수 없으므로 / form 태그 안에는 해커 방지를 위해서 다음 코드 무조건 작성)-->
+{% for choice in question.choice_set.all %}
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">  <!--forloop.counter:for태그가 반복한 횟수-->
+    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>><br>
+{% endfor %}
+<input type="submit" value="Vote"> <!--input을 누르면 value값이 넘어감-->
+</form>
