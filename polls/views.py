@@ -4,13 +4,14 @@ from django.template import context, loader
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views import generic
+from django.utils import timezone
 
 from .models import Choice, Question
 
 # Create your views here.
 # 각 view는 HttpResponse 객체 또는 Http404 중 하나를 무조건 반환한다.
 # Class view는 다른 말로 generic view : django에서 미리 제공해주는 것이 많아 python 코드보다 더 적은 코드로 같은 기능을 만들 수 있다. 하지만 장고에 익숙해질 때까지는 함수 기반 view 작성을 추천
-def index(request):
+#def index(request):
     # 1
     # return HttpResponse("Hello, World.")
 
@@ -28,20 +29,22 @@ def index(request):
     # return HttpResponse(template.render(context,request)) # data(latest_question_list)를 context를 통해 template에 전달
 
     # 4
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_question_list}
-    return render(request, 'polls/index.html', context)
+    # latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    # context = {'latest_question_list': latest_question_list}
+    # return render(request, 'polls/index.html', context)
 
-# class IndexView(generic.ListView):
-#     template_name = 'polls/index.html'
-#     context_object_name = 'latest_question_list' # context에 넘겨주는 이름이 모델이름과 다를 때 context_object_name 설정 후 get_queryset함수를 통해 필요한 데이터를 다시 작성한다.
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_question_list' # context에 넘겨주는 이름이 모델이름과 다를 때 context_object_name 설정 후 get_queryset함수를 통해 필요한 데이터를 다시 작성한다.
 
-#     def get_queryset(self):
-#         """Return the last five published questions."""
-#         return Question.objects.order_by('-pub_date')[:5]
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()
+        ).order_by('-pub_date')[:5]
 
 
-def detail(request, question_id):
+#def detail(request, question_id):
     # 1
     # return HttpResponse("You're looking at question %s." % question_id)
     
@@ -53,12 +56,18 @@ def detail(request, question_id):
     # return render(request, 'polls/detail.html', {'question':question})
 
     # 3
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/detail.html', {'question':question})
+    #question = get_object_or_404(Question, pk=question_id)
+    #return render(request, 'polls/detail.html', {'question':question})
 
-# class DetailView(generic.DetailView):
-#     model = Question
-#     template_name = 'polls/detail.html'
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'polls/detail.html'
+    
+    def get_queryset(self):
+        """
+        Excludes any questions that aren't published yet.
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 
 def results(request, question_id):
